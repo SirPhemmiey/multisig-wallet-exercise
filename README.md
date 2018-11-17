@@ -4,16 +4,16 @@
 The solution is based on [this MultiSignature Wallet](https://github.com/ConsenSys/MultiSigWallet) found in the ConsenSys github repository.
 
 
-# What is a Multisignature wallet? 
+# What is a Multisignature wallet?
 
 
-A multisignature wallet is an account that requires some m-of-n quorum of approved private keys to approve a transaction before it is executed. 
+A multisignature wallet is an account that requires some m-of-n quorum of approved private keys to approve a transaction before it is executed.
 
 
-Ethereum implements multisignature wallets slightly differently than Bitcoin does. In Ethereum, multisignature wallets are implemented as a smart contract, that each of the approved external accounts sends a transaction to in order to "sign" a group transaction. 
+Ethereum implements multisignature wallets slightly differently than Bitcoin does. In Ethereum, multisignature wallets are implemented as a smart contract, that each of the approved external accounts sends a transaction to in order to "sign" a group transaction.
 
 
-Following this project spec designed by the UPenn Blockchain Club, you will now create your own multisignature wallet contract. 
+Following this project spec designed by the UPenn Blockchain Club, you will now create your own multisignature wallet contract.
 
 
 **Note: It is not suggested that you use this multisignature wallet with any real funds, but rather use a far more deeply audited one such as the [Gnosis multisignature wallet.](https://wallet.gnosis.pm/)**
@@ -64,7 +64,7 @@ Let’s review what this contract needs to be able to do before we start writing
 The contract will have multiple owners that will determine which transactions the contract is allowed to execute. Contract owners need to be able to propose transactions that other owners can either confirm or revoke. If a proposed transaction receives enough support, it will be executed.
 
 
-Keeping these requirements in mind, let’s start going through the contract stub and start implementing this functionality. 
+Keeping these requirements in mind, let’s start going through the contract stub and start implementing this functionality.
 
 
 Remix is a browser based IDE that has code parsing built in, so it will show us any syntax or compilation errors directly in our environment. Notice the yellow triangles along the left side of the screen. Hovering over the triangle with your cursor will display the warning message. Yellow triangles are warning messages, whereas red circles are error messages and will prevent your contract from compiling.
@@ -91,7 +91,7 @@ We can create a modifier that checks these conditions
             || ownerCount == 0)
             revert();
         _;
-    }  
+    }
 ```
 
 
@@ -99,7 +99,7 @@ We can create a modifier that checks these conditions
 And call it when the constructor runs.
 
 ```javascript
-    constructor(address[] _owners, uint _required) public 
+    constructor(address[] _owners, uint _required) public
             validRequirement(_owners.length, _required)
         {...}
 ```
@@ -118,7 +118,7 @@ We also added a mapping of owner addresses to booleans so that we can quickly re
 All of these variables will be set in the constructor.
 
 ```javascript
-    constructor(address[] _owners, uint _required) public 
+    constructor(address[] _owners, uint _required) public
         validRequirement(_owners.length, _required)
     {
         for (uint i=0; i<_owners.length; i++) {
@@ -126,7 +126,7 @@ All of these variables will be set in the constructor.
         }
         owners = _owners;
         required = _required;
-    } 
+    }
 ```
 
 Submit Transaction
@@ -147,9 +147,9 @@ Looking at the rest of the contract stub, you will notice that there are two oth
 We can easily implement `submitTransaction` with the help of these other functions:
 
 ```javascript
-    function submitTransaction(address destination, uint value, bytes data) 
-        public 
-        returns (uint transactionId) 
+    function submitTransaction(address destination, uint value, bytes data)
+        public
+        returns (uint transactionId)
     {
         require(isOwner[msg.sender]);
         transactionId = addTransaction(destination, value, data);
@@ -184,7 +184,7 @@ We need to store the inputs to the `addTransaction` function in a Transaction st
     mapping (uint => Transaction) public transactions;
 ```
 
-In the `addTransaction` function we can get the transaction count, store the transaction in the mapping and increment the count. This function modifies the state so it is a good practice to emit an event. 
+In the `addTransaction` function we can get the transaction count, store the transaction in the mapping and increment the count. This function modifies the state so it is a good practice to emit an event.
 
 
 We will emit a `Submission` event that takes a `transactionId`. Let’s define the event first. Events are usually defined at the top of a Solidity contract, so that is what we will do. Add this line just below the contract declaration.
@@ -362,7 +362,7 @@ Interacting with the Contract
 Now that we have a basic MultiSignature Wallet, let’s interact with the Multisig Wallet and see how it works.
 
 
-Copy the contract that we developed in Remix into the truffle project directory provided. 
+Copy the contract that we developed in Remix into the truffle project directory provided.
 
 
 You can see that the project directory comes with a SimpleStorage.sol contract. This is the contract that we are going to be calling from the Multisig contract.
@@ -387,7 +387,7 @@ We are only going to require 2 confirmations for the sake of simplicity.
 To deploy the contracts, start the development environment by running truffle develop in a terminal window at the project directory. The truffle command line will appear
 
 ```
-truffle(develop)> 
+truffle(develop)>
 ```
 
 Deploy the contracts
@@ -431,7 +431,7 @@ So the MultiSig contract call looks like:
 truffle(develop)> ms.submitTransaction(ss.address, 0, encoded, {from: web3.eth.accounts[0]})
 ```
 
-And we see the transaction information printed in the terminal window. In the logs, we can see that a “Submission” event was fired, as well as a “Confirmation” event, which is what we expect. 
+And we see the transaction information printed in the terminal window. In the logs, we can see that a “Submission” event was fired, as well as a “Confirmation” event, which is what we expect.
 
 
 The current state of the MultiSig has one transaction that has not been executed and has one confirmation (from the address that submitted it). One more confirmation should cause the transaction to execute. Let’s use the second account to confirm it. The `confirmTransaction` function takes one input, the index of the Transaction to confirm.
